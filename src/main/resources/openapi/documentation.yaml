@@ -1,16 +1,16 @@
 openapi: "3.0.3"
 info:
-  title: "Application API"
-  description: "Application API"
+  title: "Railway Station API"
+  description: "API for managing railway stations, parks, ways, locomotives, and wagons."
   version: "1.0.0"
 servers:
   - url: "http://0.0.0.0:8080"
 paths:
   /:
     get:
-      description: "Hello World!"
+      summary: "Hello World!"
       responses:
-        "200":
+        '200':
           description: "OK"
           content:
             text/plain:
@@ -19,5 +19,147 @@ paths:
               examples:
                 Example#1:
                   value: "Hello World!"
+  /stations:
+    get:
+      summary: "Get a list of stations"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/StationShort"
+  /stations/{id}:
+    get:
+      summary: "Get information about a specific station"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Station ID"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Station"
+        '400':
+          description: "Bad Request"
+  /park/{id}:
+    get:
+      summary: "Get information about a specific park"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Park ID"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Park"
+        '400':
+          description: "Bad Request"
+  /way/{id}:
+    get:
+      summary: "Get information about a specific way"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "Way ID"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Way"
+        '400':
+          description: "Bad Request"
 components:
   schemas:
+    StationShort:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        title:
+          type: "string"
+        isLoginStation:
+          type: "boolean"
+    Station:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        title:
+          type: "string"
+        isLoginStation:
+          type: "boolean"
+        parksCount:
+          type: "integer"
+        parksIds:
+          type: "array"
+          items:
+            type: "integer"
+    Park:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        stationId:
+          type: "integer"
+        name:
+          type: "string"
+        waysCount:
+          type: "integer"
+        waysIds:
+          type: "array"
+          items:
+            type: "integer"
+    Way:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        parkId:
+          type: "integer"
+        name:
+          type: "string"
+        locomotives:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Locomotive"
+        wagonsCount:
+          type: "integer"
+        wagonsIds:
+          type: "array"
+          items:
+            type: "integer"
+        maxCarriagesCount:
+          type: "integer"
+    Locomotive:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        inventoryNumber:
+          type: "string"
+        direction:
+          type: "string"
+          enum:
+            - "FORWARD"
+            - "BACKWARD"
+

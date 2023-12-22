@@ -18,8 +18,6 @@ fun main() {
 }
 
 object BDLoader {
-    val JSON: MediaType = "application/json".toMediaType()
-
     val client: OkHttpClient = OkHttpClient().newBuilder().apply {
         this.addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -37,7 +35,6 @@ object BDLoader {
             .url("http://localhost:4000/stationsList")
             .build()
         val response = client.newCall(request).execute()
-
 
         val data = gson.fromJson<List<Station>>(response.body?.string(), listType)
 
@@ -71,7 +68,6 @@ object BDLoader {
             .build()
         val response = client.newCall(request).execute()
 
-
         val data = gson.fromJson<List<String>>(response.body?.string(), listType)
 
         return WagonTypeList(data)
@@ -104,7 +100,6 @@ object BDLoader {
             .build()
         val response = client.newCall(request).execute()
 
-
         val data = gson.fromJson<List<OperationsTypesNorms>>(response.body?.string(), listType)
 
         return data
@@ -120,7 +115,6 @@ object BDLoader {
             .build()
         val response = client.newCall(request).execute()
 
-
         val data = gson.fromJson<List<OperationsTypes>>(response.body?.string(), listType)
 
         return data
@@ -135,7 +129,6 @@ object BDLoader {
             .url("http://localhost:4000/operationsList")
             .build()
         val response = client.newCall(request).execute()
-
 
         val data = gson.fromJson<List<OperationsList>>(response.body?.string(), listType)
 
