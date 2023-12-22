@@ -1,6 +1,9 @@
 package ru.xyecos.domain.responses
 
 data class Wagon (
+    val wayId: Int,
+    val parkId: Int,
+    val stationId: Int,
     val id: Int,
     val inventoryNumber: String,
     val position: Int,

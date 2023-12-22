@@ -3,6 +3,7 @@ package ru.xyecos.domain.responses
 data class Way(
     val id: Int,
     val parkId: Int,
+    val stationId: Int,
     val name: String,
     val maxCarriagesCount: Int,
     val locomotives: List<Locomotive>,

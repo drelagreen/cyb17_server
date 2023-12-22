@@ -2,7 +2,7 @@
 
 Railway Station API
 - API version: 1.0.0
-  - Build date: 2023-12-22T22:02:19.702695+03:00[Europe/Moscow]
+  - Build date: 2023-12-22T22:15:41.762441+03:00[Europe/Moscow]
 
 API for managing railway stations, parks, ways, locomotives, and wagons.
 

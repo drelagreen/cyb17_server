@@ -1,6 +1,5 @@
 .github/workflows/maven.yml
 .gitignore
-.openapi-generator-ignore
 .travis.yml
 README.md
 api/openapi.yaml
@@ -45,9 +44,3 @@ src/main/java/org/openapitools/client/model/Park.java
 src/main/java/org/openapitools/client/model/Station.java
 src/main/java/org/openapitools/client/model/StationShort.java
 src/main/java/org/openapitools/client/model/Way.java
-src/test/java/org/openapitools/client/api/DefaultApiTest.java
-src/test/java/org/openapitools/client/model/LocomotiveTest.java
-src/test/java/org/openapitools/client/model/ParkTest.java
-src/test/java/org/openapitools/client/model/StationShortTest.java
-src/test/java/org/openapitools/client/model/StationTest.java
-src/test/java/org/openapitools/client/model/WayTest.java

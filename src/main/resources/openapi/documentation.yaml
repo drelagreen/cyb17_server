@@ -6,6 +6,27 @@ info:
 servers:
   - url: "http://0.0.0.0:8080"
 paths:
+  /wagon/{id}:
+    get:
+      summary: Get wagon by ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the wagon to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WagonResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Wagon not found
   /:
     get:
       summary: "Hello World!"
@@ -90,6 +111,52 @@ paths:
           description: "Bad Request"
 components:
   schemas:
+    WagonResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        inventoryNumber:
+          type: string
+        position:
+          type: integer
+        type:
+          type: string
+        isSick:
+          type: boolean
+        cargo:
+          $ref: '#/components/schemas/Cargo'
+        operationState:
+          type: string
+        idleDaysLength:
+          type: integer
+        owner:
+          type: string
+        isWithHatch:
+          type: boolean
+        loadCapacity:
+          type: number
+        daysToRepair:
+          type: integer
+        kilometersLeft:
+          type: integer
+        isDirty:
+          type: boolean
+        note1:
+          type: string
+        note2:
+          type: string
+        parkId:
+          type: integer
+        stationId:
+          type: integer
+        wayId:
+          type: integer
+    Cargo:
+      type: object
+      properties:
+        cargoType:
+          type: string
     StationShort:
       type: "object"
       properties:
@@ -162,4 +229,5 @@ components:
           enum:
             - "FORWARD"
             - "BACKWARD"
+
 
