@@ -1,8 +1,9 @@
 package ru.xyecos.repos
 
+import ru.xyecos.bd.BDLoader
 import ru.xyecos.domain.StationData
 
-class StationsRepo() {
+class StationDataRepo() {
     private val data: MutableList<StationData> = mutableListOf()
 
     fun getStations(): List<StationData> {
@@ -28,5 +29,21 @@ class StationsRepo() {
 
     fun deleteAll() {
         data.clear()
+    }
+
+    companion object {
+        private var instance: StationDataRepo? = null
+
+        fun getInstance(): StationDataRepo {
+            if (instance == null) {
+                instance = StationDataRepo()
+            }
+
+            BDLoader.loadStationsData().forEach {
+                instance!!.addStation(it)
+            }
+
+            return instance!!
+        }
     }
 }

@@ -144,4 +144,22 @@ object BDLoader {
         println("OperationsList loaded")
         return data
     }
+
+    fun loadOperationReasonsList(): List<OperationReasonsList> {
+        println("Loading OperationReasonsList...")
+
+        val listType = object : TypeToken<List<OperationReasonsList>>() {}.type
+
+        val request = okhttp3.Request.Builder()
+            .url("http://localhost:4000/operationReasonsList")
+            .build()
+        val response = client.newCall(request).execute()
+
+        println(response.body?.string())
+
+        val data = gson.fromJson<List<OperationReasonsList>>(response.body?.string(), listType)
+
+        println("OperationReasonsList loaded")
+        return data
+    }
 }
