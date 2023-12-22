@@ -227,7 +227,7 @@ components:
         direction:
           type: "string"
           enum:
-            - "FORWARD"
-            - "BACKWARD"
+            - "LEFT"
+            - "RIGHT"
 
 

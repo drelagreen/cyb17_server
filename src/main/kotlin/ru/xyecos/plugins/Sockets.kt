@@ -4,6 +4,10 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ru.xyecos.service.FormsNotifier
 import java.time.Duration
 
 fun Application.configureSockets() {
@@ -14,16 +18,27 @@ fun Application.configureSockets() {
         masking = false
     }
     routing {
-        webSocket("/ws") { // websocketSession
-            for (frame in incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    outgoing.send(Frame.Text("YOU SAID: $text"))
-                    if (text.equals("bye", ignoreCase = true)) {
-                        close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
+        var i = 0
+        get("/test") {
+            FormsNotifier.notifyFormOpened(i++)
+        }
+
+        webSocket("/forms") {
+            var connected = true
+            val job = launch(Dispatchers.IO) {
+                FormsNotifier.openedForms.collect {
+                    try {
+                        outgoing.send(Frame.Text(it.toList().toString()))
+                    } catch (e: Throwable) {
+                        println(e.localizedMessage)
+                        connected = false
                     }
                 }
             }
+            while (connected) {
+                delay(500)
+            }
+            job.cancel()
         }
     }
 }
