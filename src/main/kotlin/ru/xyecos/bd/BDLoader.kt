@@ -9,7 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import ru.xyecos.domain.*
 
 
-object Loader {
+object BDLoader {
     val JSON: MediaType = "application/json".toMediaType()
 
     val client: OkHttpClient = OkHttpClient().newBuilder().apply {
@@ -19,6 +19,24 @@ object Loader {
     }.build()
 
     val gson = Gson()
+
+    fun loadStationsList() : List<Station> {
+        println("Loading StationsList...")
+
+        val listType = object : TypeToken<List<Station>>() {}.type
+
+        val request = okhttp3.Request.Builder()
+            .url("http://localhost:4000/stationsList")
+            .build()
+        val response = client.newCall(request).execute()
+
+        println(response.body?.string())
+
+        val data = gson.fromJson<List<Station>>(response.body?.string(), listType)
+
+        println("StationsList loaded")
+        return data
+    }
 
     fun loadStationsData(): List<StationData> {
         val listType = object : TypeToken<List<StationData>>() {}.type

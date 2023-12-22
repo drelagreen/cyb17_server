@@ -9,7 +9,5 @@ import ru.xyecos.domain.StationData
 class Stations {
     val stationsList: MutableList<StationData> = mutableListOf()
 
-    fun loadStations() {
 
-    }
 }
