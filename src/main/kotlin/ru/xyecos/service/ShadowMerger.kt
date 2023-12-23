@@ -6,16 +6,16 @@ object ShadowMerger {
     fun mergeWagonMove(formId: Int) {
         val form = FormsArchive.instance.getWagonMoveForm(formId) ?: return
 
-        form.wagons.forEach {
+        form.wagons?.forEach {
             val wagon = WagonsRepo.getInstance().get(it)
 
-            val depWay = WaysRepo.getInstance().get(form.departureWay)
+            val depWay = WaysRepo.getInstance().get(form.departureWay!!)
 
-            val destWay = WaysRepo.getInstance().get(form.destinationWay)
+            val destWay = WaysRepo.getInstance().get(form.destinationWay!!)
 
             val newWagon = wagon?.copy(
-                position = form.destinationStation,
-                parkId = form.destinationPark,
+                position = form.destinationStation!!,
+                parkId = form.destinationPark!!,
                 wayId = form.destinationWay
             )
 

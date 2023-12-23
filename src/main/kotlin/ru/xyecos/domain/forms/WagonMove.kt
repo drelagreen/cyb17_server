@@ -1,24 +1,22 @@
 package ru.xyecos.domain.forms
 
 data class WagonMove(
-    val timestamp: Long,
-    val formId: Int,
+    val timestamp: Long? = null,
+    val formId: Int? = null,
 
-    val departureStation: Int,
-    val departurePark: Int,
-    val departureWay: Int,
+    val departureStation: Int? = null,
+    val departurePark: Int? = null,
+    val departureWay: Int? = null,
 
-    val destinationStation: Int,
-    val destinationPark: Int,
-    val destinationWay: Int,
+    val destinationStation: Int? = null,
+    val destinationPark: Int? = null,
+    val destinationWay: Int? = null,
 
-    val locomotives: List<Int>,
-    val wagons: List<Int>,
+    val locomotives: List<Int>? = null,
+    val wagons: List<Int>? = null,
 
-    val comment: String,
-    val operationInitiator: String,
-    val reasonId: Int,
-    val needAcceptance: Boolean,
-
-    val deviationMinutes: String
+    val comment: String? = null,
+    val operationInitiator: String? = null,
+    val reasonId: Int? = null,
+    val needAcceptance: Boolean? = null,
 )

@@ -18,6 +18,7 @@ class StationsRepo {
     }
 
     fun add(station: Station) {
+        if (data.find { it.id == station.id } != null) return
         data.add(station)
     }
 
@@ -50,7 +51,7 @@ class StationsRepo {
                 stationsIds.forEach { id ->
                     val stationsList = stationsData.filter {
                         it.station.id == id
-                    }
+                    }.distinct()
 
                     val stationShort = BDLoader.loadStationsList().map {
                         StationShort(it.id, it.title, it.isLoginStation)

@@ -2,11 +2,14 @@ package ru.xyecos.plugins
 
 import com.google.gson.Gson
 import io.ktor.http.*
+import io.ktor.http.ContentDisposition.Companion.File
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.xyecos.domain.forms.FormReviewResult
+import ru.xyecos.domain.forms.LocomotiveMove
 import ru.xyecos.domain.forms.WagonMove
 import ru.xyecos.domain.responses.form.FormCreated
 import ru.xyecos.domain.responses.form.ShadowMergeResults
@@ -14,6 +17,7 @@ import ru.xyecos.repos.*
 import ru.xyecos.service.FormsNotifier
 import ru.xyecos.service.ShadowMerger
 import ru.xyecos.service.stationsDataRoutes
+import java.io.File
 import java.util.*
 
 fun Application.configureRouting() {
@@ -21,8 +25,51 @@ fun Application.configureRouting() {
     routing {
         stationsDataRoutes(gson)
         wagonsFunctions(gson)
+        locomotiveFunctions(gson)
+        staticFiles("/apidoc", File("/Users/dzhalnin/redoc-static.html"))
+    }
+}
+
+var o = 0
+
+fun Routing.locomotiveFunctions(gson: Gson) {
+    get("/test") {
+        call.respondText(
+            gson.toJson(
+                WaysRepo.getInstance().getAll().map {
+                    it.locomotives
+                }.distinct()
+            )
+        )
+
+        FormsNotifier.notifyFormOpened(o++)
     }
 
+    post("/forms/locomotives/move") {
+        val form = call.receiveNullable<LocomotiveMove>()
+
+        if (form == null) {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        FormsStatusRepo.instance.openForm(form.formId)
+
+        FormsArchive.instance.saveLocomotiveMoveForm(form)
+        FormsArchive.instance.saveReviewResult(
+            FormReviewResult(
+                form.formId,
+                true,
+                0,
+                "Автоматическое подтверждение",
+                Date().time
+            )
+        )
+
+        FormsStatusRepo.instance.acceptForm(form.formId)
+
+        call.respond(HttpStatusCode.OK)
+    }
 }
 
 fun Routing.wagonsFunctions(gson: Gson) {
@@ -46,11 +93,15 @@ fun Routing.wagonsFunctions(gson: Gson) {
             return@post
         }
 
-        FormsStatusRepo.instance.openForm(form.formId)
+        FormsStatusRepo.instance.openForm(form.formId!!)
 
         FormsArchive.instance.saveWagonMoveForm(form)
 
-        call.respond(HttpStatusCode.OK)
+        FormsNotifier.notifyFormOpened(form.formId)
+
+        call.respond(
+            HttpStatusCode.OK
+        )
     }
 
     post("/forms/formReview") {

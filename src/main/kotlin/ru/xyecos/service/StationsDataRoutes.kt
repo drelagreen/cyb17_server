@@ -13,8 +13,8 @@ import ru.xyecos.repos.*
  * Тут мы инициализируем список станций из БД, храним списки станций,
  * CRUD методы для станций, общие логические методы для станций
  */
-fun Routing.stationsDataRoutes(gson: Gson) {
 
+fun Routing.stationsDataRoutes(gson: Gson) {
     get("/") {
         call.respondText("API For Railway Stations System")
     }
