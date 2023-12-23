@@ -26,8 +26,8 @@ object BDLoader {
 
     val gson = Gson()
 
-    fun loadStationsList() : List<Station> {
-        val listType = object : TypeToken<List<Station>>() {}.type
+    fun loadStationsList() : List<StationDataShort> {
+        val listType = object : TypeToken<List<StationDataShort>>() {}.type
 
         val request = okhttp3.Request.Builder()
             .get()
@@ -36,7 +36,7 @@ object BDLoader {
             .build()
         val response = client.newCall(request).execute()
 
-        val data = gson.fromJson<List<Station>>(response.body?.string(), listType)
+        val data = gson.fromJson<List<StationDataShort>>(response.body?.string(), listType)
 
         return data
     }

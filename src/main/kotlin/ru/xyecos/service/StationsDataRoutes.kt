@@ -5,9 +5,9 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import ru.xyecos.domain.*
 import ru.xyecos.domain.responses.*
-import ru.xyecos.repos.StationDataRepo
-import ru.xyecos.repos.StationsListRepo
+import ru.xyecos.repos.*
 
 /**
  * Тут мы инициализируем список станций из БД, храним списки станций,
@@ -17,21 +17,13 @@ fun Routing.stationsDataRoutes(gson: Gson) {
 
     get("/") {
         call.respondText("API For Railway Stations System")
-
-        StationDataRepo.getInstance().getStations().apply {
-            println(this)
-        }
     }
-
-    //список вагонов
 
     //список станций
     get("/stations") {
         call.respondText(
             gson.toJson(
-                StationsListRepo.getInstance().getStations().map {
-                    StationShort(it.id, it.title, it.isLoginStation)
-                }
+                StationsRepo.getInstance().getAll()
             )
         )
     }
@@ -44,31 +36,16 @@ fun Routing.stationsDataRoutes(gson: Gson) {
             return@get
         }
 
-        val stationsList = StationDataRepo.getInstance().getStations().filter {
-            it.station.id == id
-        }
+        val station = StationsRepo.getInstance().get(id)
 
-        val stationShort = StationsListRepo.getInstance().getStations().map {
-            StationShort(it.id, it.title, it.isLoginStation)
-        }.find {
-            it.id == id
+        if (station == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
         }
-
-        val parks = stationsList.map {
-            it.park
-        }.distinct()
 
         call.respondText(
             gson.toJson(
-                Station(
-                    id = id,
-                    title = stationsList.firstOrNull()?.station?.name ?: "",
-                    isLoginStation = stationShort?.isLoginStation ?: false,
-                    parksCount = parks.size,
-                    parksIds = parks.map {
-                        it.id
-                    }
-                )
+                station
             )
         )
     }
@@ -81,25 +58,16 @@ fun Routing.stationsDataRoutes(gson: Gson) {
             return@get
         }
 
-        val stationsList = StationDataRepo.getInstance().getStations().filter {
-            it.park.id == id
-        }
+        val park = ParksRepo.getInstance().get(id)
 
-        val ways = stationsList.map {
-            it.way
-        }.distinct()
+        if (park == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
+        }
 
         call.respondText(
             gson.toJson(
-                Park(
-                    id = id,
-                    stationId = stationsList.firstOrNull()?.station?.id ?: 0,
-                    name = stationsList.firstOrNull()?.park?.name ?: "",
-                    waysCount = ways.size,
-                    waysIds = ways.map {
-                        it.id
-                    }
-                )
+                park
             )
         )
     }
@@ -112,38 +80,16 @@ fun Routing.stationsDataRoutes(gson: Gson) {
             return@get
         }
 
-        val stationsList = StationDataRepo.getInstance().getStations().filter {
-            it.way.id == id
+        val way = WaysRepo.getInstance().get(id)
+
+        if (way == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
         }
-
-        val locomotives = stationsList.flatMap {
-            it.locomotives
-        }.distinct()
-
-        val wagons = stationsList.flatMap {
-            it.wagons
-        }.distinct()
 
         call.respondText(
             gson.toJson(
-                Way(
-                    id = id,
-                    parkId = stationsList.firstOrNull()?.park?.id ?: 0,
-                    name = stationsList.firstOrNull()?.way?.name ?: "",
-                    locomotives = locomotives.map {
-                        Way.Locomotive(
-                            id = it.id,
-                            inventoryNumber = it.inventoryNumber,
-                            direction = Way.Locomotive.Direction.valueOf(it.direction)
-                        )
-                    },
-                    wagonsCount = wagons.size,
-                    wagonsIds = wagons.map {
-                        it.id
-                    },
-                    maxCarriagesCount = stationsList.firstOrNull()?.maxCarriagesCount ?: 0,
-                    stationId = stationsList.firstOrNull()?.station?.id ?: 0
-                )
+                way
             )
         )
     }
@@ -156,17 +102,7 @@ fun Routing.stationsDataRoutes(gson: Gson) {
             return@get
         }
 
-        val stationData = StationDataRepo.getInstance().getStations().find {
-            it.wagons.any {
-                it.id == id
-            }
-        }
-
-        val wagon = StationDataRepo.getInstance().getStations().flatMap {
-            it.wagons
-        }.find {
-            it.id == id
-        }
+        val wagon = WagonsRepo.getInstance().get(id)
 
         if (wagon == null) {
             call.respond(HttpStatusCode.NotFound)
@@ -175,27 +111,7 @@ fun Routing.stationsDataRoutes(gson: Gson) {
 
         call.respondText(
             gson.toJson(
-                Wagon(
-                    id = wagon.id,
-                    inventoryNumber = wagon.inventoryNumber,
-                    position = wagon.position,
-                    type = wagon.type,
-                    isSick = wagon.isSick,
-                    cargo = wagon.cargo,
-                    operationState = wagon.operationState,
-                    idleDaysLength = wagon.idleDaysLength,
-                    owner = wagon.owner,
-                    isWithHatch = wagon.isWithHatch,
-                    loadCapacity = wagon.loadCapacity,
-                    daysToRepair = wagon.daysToRepair,
-                    kilometersLeft = wagon.kilometersLeft,
-                    isDirty = wagon.isDirty,
-                    note1 = wagon.note1,
-                    note2 = wagon.note2,
-                    parkId = stationData?.park?.id ?: 0,
-                    stationId = stationData?.station?.id ?: 0,
-                    wayId = stationData?.way?.id ?: 0
-                )
+                wagon
             )
         )
     }

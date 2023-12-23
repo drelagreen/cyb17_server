@@ -2,7 +2,7 @@
 
 Railway Station API
 - API version: 1.0.0
-  - Build date: 2023-12-22T22:15:41.762441+03:00[Europe/Moscow]
+  - Build date: 2023-12-23T05:23:19.175324+03:00[Europe/Moscow]
 
 API for managing railway stations, parks, ways, locomotives, and wagons.
 
@@ -115,18 +115,20 @@ All URIs are relative to *http://0.0.0.0:8080*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**parkIdGet**](docs/DefaultApi.md#parkIdGet) | **GET** /park/{id} | Get information about a specific park
-*DefaultApi* | [**rootGet**](docs/DefaultApi.md#rootGet) | **GET** / | Hello World!
 *DefaultApi* | [**stationsGet**](docs/DefaultApi.md#stationsGet) | **GET** /stations | Get a list of stations
 *DefaultApi* | [**stationsIdGet**](docs/DefaultApi.md#stationsIdGet) | **GET** /stations/{id} | Get information about a specific station
+*DefaultApi* | [**wagonIdGet**](docs/DefaultApi.md#wagonIdGet) | **GET** /wagon/{id} | Get wagon by ID
 *DefaultApi* | [**wayIdGet**](docs/DefaultApi.md#wayIdGet) | **GET** /way/{id} | Get information about a specific way
 
 
 ## Documentation for Models
 
+ - [Cargo](docs/Cargo.md)
  - [Locomotive](docs/Locomotive.md)
  - [Park](docs/Park.md)
  - [Station](docs/Station.md)
  - [StationShort](docs/StationShort.md)
+ - [WagonResponse](docs/WagonResponse.md)
  - [Way](docs/Way.md)
 
 

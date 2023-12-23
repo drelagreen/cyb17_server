@@ -5,11 +5,13 @@ README.md
 api/openapi.yaml
 build.gradle
 build.sbt
+docs/Cargo.md
 docs/DefaultApi.md
 docs/Locomotive.md
 docs/Park.md
 docs/Station.md
 docs/StationShort.md
+docs/WagonResponse.md
 docs/Way.md
 git_push.sh
 gradle.properties
@@ -39,8 +41,12 @@ src/main/java/org/openapitools/client/auth/Authentication.java
 src/main/java/org/openapitools/client/auth/HttpBasicAuth.java
 src/main/java/org/openapitools/client/auth/HttpBearerAuth.java
 src/main/java/org/openapitools/client/model/AbstractOpenApiSchema.java
+src/main/java/org/openapitools/client/model/Cargo.java
 src/main/java/org/openapitools/client/model/Locomotive.java
 src/main/java/org/openapitools/client/model/Park.java
 src/main/java/org/openapitools/client/model/Station.java
 src/main/java/org/openapitools/client/model/StationShort.java
+src/main/java/org/openapitools/client/model/WagonResponse.java
 src/main/java/org/openapitools/client/model/Way.java
+src/test/java/org/openapitools/client/model/CargoTest.java
+src/test/java/org/openapitools/client/model/WagonResponseTest.java

@@ -5,9 +5,9 @@ All URIs are relative to *http://0.0.0.0:8080*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**parkIdGet**](DefaultApi.md#parkIdGet) | **GET** /park/{id} | Get information about a specific park |
-| [**rootGet**](DefaultApi.md#rootGet) | **GET** / | Hello World! |
 | [**stationsGet**](DefaultApi.md#stationsGet) | **GET** /stations | Get a list of stations |
 | [**stationsIdGet**](DefaultApi.md#stationsIdGet) | **GET** /stations/{id} | Get information about a specific station |
+| [**wagonIdGet**](DefaultApi.md#wagonIdGet) | **GET** /wagon/{id} | Get wagon by ID |
 | [**wayIdGet**](DefaultApi.md#wayIdGet) | **GET** /way/{id} | Get information about a specific way |
 
 
@@ -71,62 +71,6 @@ No authorization required
 |-------------|-------------|------------------|
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
-
-<a name="rootGet"></a>
-# **rootGet**
-> String rootGet()
-
-Hello World!
-
-### Example
-```java
-// Import classes:
-import org.openapitools.client.ApiClient;
-import org.openapitools.client.ApiException;
-import org.openapitools.client.Configuration;
-import org.openapitools.client.models.*;
-import org.openapitools.client.api.DefaultApi;
-
-public class Example {
-  public static void main(String[] args) {
-    ApiClient defaultClient = Configuration.getDefaultApiClient();
-    defaultClient.setBasePath("http://0.0.0.0:8080");
-
-    DefaultApi apiInstance = new DefaultApi(defaultClient);
-    try {
-      String result = apiInstance.rootGet();
-      System.out.println(result);
-    } catch (ApiException e) {
-      System.err.println("Exception when calling DefaultApi#rootGet");
-      System.err.println("Status code: " + e.getCode());
-      System.err.println("Reason: " + e.getResponseBody());
-      System.err.println("Response headers: " + e.getResponseHeaders());
-      e.printStackTrace();
-    }
-  }
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-**String**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: text/plain
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **200** | OK |  -  |
 
 <a name="stationsGet"></a>
 # **stationsGet**
@@ -244,6 +188,68 @@ No authorization required
 |-------------|-------------|------------------|
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
+
+<a name="wagonIdGet"></a>
+# **wagonIdGet**
+> WagonResponse wagonIdGet(id)
+
+Get wagon by ID
+
+### Example
+```java
+// Import classes:
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.Configuration;
+import org.openapitools.client.models.*;
+import org.openapitools.client.api.DefaultApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://0.0.0.0:8080");
+
+    DefaultApi apiInstance = new DefaultApi(defaultClient);
+    Integer id = 56; // Integer | ID of the wagon to retrieve
+    try {
+      WagonResponse result = apiInstance.wagonIdGet(id);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling DefaultApi#wagonIdGet");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | **Integer**| ID of the wagon to retrieve | |
+
+### Return type
+
+[**WagonResponse**](WagonResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Successful response |  -  |
+| **400** | Bad request |  -  |
+| **404** | Wagon not found |  -  |
 
 <a name="wayIdGet"></a>
 # **wayIdGet**

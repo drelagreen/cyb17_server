@@ -3,14 +3,18 @@ package ru.xyecos.repos
 import java.util.concurrent.atomic.AtomicInteger
 
 class FormsStatusRepo {
-    val data: MutableMap<Int, Status> = mutableMapOf()
+    private val data: MutableMap<Int, Status> = mutableMapOf()
 
     @Volatile
     var currentID: AtomicInteger = AtomicInteger(1)
 
+    fun getForms(): Map<Int, Status> = data
+
     @Synchronized
     fun generateFormId(): Int {
-        return currentID.getAndIncrement()
+        val id = currentID.getAndIncrement()
+        data[id] = Status.CREATION
+        return id
     }
     @Synchronized
     fun openForm(id: Int) {
@@ -21,7 +25,7 @@ class FormsStatusRepo {
         data[id] = Status.ACCEPTED
     }
     @Synchronized
-    fun declineForm(id: Int) {
+    fun rejectForm(id: Int) {
         data[id] = Status.DECLINED
     }
 

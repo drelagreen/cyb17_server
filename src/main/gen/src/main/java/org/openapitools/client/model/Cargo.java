@@ -45,91 +45,37 @@ import java.util.Set;
 import org.openapitools.client.JSON;
 
 /**
- * StationShort
+ * Cargo
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-12-23T05:23:19.175324+03:00[Europe/Moscow]")
-public class StationShort {
-  public static final String SERIALIZED_NAME_ID = "id";
-  @SerializedName(SERIALIZED_NAME_ID)
-  private Integer id;
+public class Cargo {
+  public static final String SERIALIZED_NAME_CARGO_TYPE = "cargoType";
+  @SerializedName(SERIALIZED_NAME_CARGO_TYPE)
+  private String cargoType;
 
-  public static final String SERIALIZED_NAME_TITLE = "title";
-  @SerializedName(SERIALIZED_NAME_TITLE)
-  private String title;
-
-  public static final String SERIALIZED_NAME_IS_LOGIN_STATION = "isLoginStation";
-  @SerializedName(SERIALIZED_NAME_IS_LOGIN_STATION)
-  private Boolean isLoginStation;
-
-  public StationShort() {
+  public Cargo() {
   }
 
-  public StationShort id(Integer id) {
+  public Cargo cargoType(String cargoType) {
     
-    this.id = id;
+    this.cargoType = cargoType;
     return this;
   }
 
    /**
-   * Get id
-   * @return id
+   * Get cargoType
+   * @return cargoType
   **/
   @javax.annotation.Nullable
   @ApiModelProperty(value = "")
 
-  public Integer getId() {
-    return id;
+  public String getCargoType() {
+    return cargoType;
   }
 
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
-
-  public StationShort title(String title) {
-    
-    this.title = title;
-    return this;
-  }
-
-   /**
-   * Get title
-   * @return title
-  **/
-  @javax.annotation.Nullable
-  @ApiModelProperty(value = "")
-
-  public String getTitle() {
-    return title;
-  }
-
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-
-  public StationShort isLoginStation(Boolean isLoginStation) {
-    
-    this.isLoginStation = isLoginStation;
-    return this;
-  }
-
-   /**
-   * Get isLoginStation
-   * @return isLoginStation
-  **/
-  @javax.annotation.Nullable
-  @ApiModelProperty(value = "")
-
-  public Boolean getIsLoginStation() {
-    return isLoginStation;
-  }
-
-
-  public void setIsLoginStation(Boolean isLoginStation) {
-    this.isLoginStation = isLoginStation;
+  public void setCargoType(String cargoType) {
+    this.cargoType = cargoType;
   }
 
 
@@ -142,24 +88,20 @@ public class StationShort {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StationShort stationShort = (StationShort) o;
-    return Objects.equals(this.id, stationShort.id) &&
-        Objects.equals(this.title, stationShort.title) &&
-        Objects.equals(this.isLoginStation, stationShort.isLoginStation);
+    Cargo cargo = (Cargo) o;
+    return Objects.equals(this.cargoType, cargo.cargoType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, isLoginStation);
+    return Objects.hash(cargoType);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StationShort {\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("    isLoginStation: ").append(toIndentedString(isLoginStation)).append("\n");
+    sb.append("class Cargo {\n");
+    sb.append("    cargoType: ").append(toIndentedString(cargoType)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -182,9 +124,7 @@ public class StationShort {
   static {
     // a set of all properties/fields (JSON key names)
     openapiFields = new HashSet<String>();
-    openapiFields.add("id");
-    openapiFields.add("title");
-    openapiFields.add("isLoginStation");
+    openapiFields.add("cargoType");
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>();
@@ -194,26 +134,26 @@ public class StationShort {
   * Validates the JSON Object and throws an exception if issues found
   *
   * @param jsonObj JSON Object
-  * @throws IOException if the JSON Object is invalid with respect to StationShort
+  * @throws IOException if the JSON Object is invalid with respect to Cargo
   */
   public static void validateJsonObject(JsonObject jsonObj) throws IOException {
       if (jsonObj == null) {
-        if (StationShort.openapiRequiredFields.isEmpty()) {
+        if (Cargo.openapiRequiredFields.isEmpty()) {
           return;
         } else { // has required fields
-          throw new IllegalArgumentException(String.format("The required field(s) %s in StationShort is not found in the empty JSON string", StationShort.openapiRequiredFields.toString()));
+          throw new IllegalArgumentException(String.format("The required field(s) %s in Cargo is not found in the empty JSON string", Cargo.openapiRequiredFields.toString()));
         }
       }
 
       Set<Entry<String, JsonElement>> entries = jsonObj.entrySet();
       // check to see if the JSON string contains additional fields
       for (Entry<String, JsonElement> entry : entries) {
-        if (!StationShort.openapiFields.contains(entry.getKey())) {
-          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `StationShort` properties. JSON: %s", entry.getKey(), jsonObj.toString()));
+        if (!Cargo.openapiFields.contains(entry.getKey())) {
+          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `Cargo` properties. JSON: %s", entry.getKey(), jsonObj.toString()));
         }
       }
-      if ((jsonObj.get("title") != null && !jsonObj.get("title").isJsonNull()) && !jsonObj.get("title").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `title` to be a primitive type in the JSON string but got `%s`", jsonObj.get("title").toString()));
+      if ((jsonObj.get("cargoType") != null && !jsonObj.get("cargoType").isJsonNull()) && !jsonObj.get("cargoType").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format("Expected the field `cargoType` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cargoType").toString()));
       }
   }
 
@@ -221,22 +161,22 @@ public class StationShort {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!StationShort.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'StationShort' and its subtypes
+       if (!Cargo.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'Cargo' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<StationShort> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(StationShort.class));
+       final TypeAdapter<Cargo> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(Cargo.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<StationShort>() {
+       return (TypeAdapter<T>) new TypeAdapter<Cargo>() {
            @Override
-           public void write(JsonWriter out, StationShort value) throws IOException {
+           public void write(JsonWriter out, Cargo value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              elementAdapter.write(out, obj);
            }
 
            @Override
-           public StationShort read(JsonReader in) throws IOException {
+           public Cargo read(JsonReader in) throws IOException {
              JsonObject jsonObj = elementAdapter.read(in).getAsJsonObject();
              validateJsonObject(jsonObj);
              return thisAdapter.fromJsonTree(jsonObj);
@@ -247,18 +187,18 @@ public class StationShort {
   }
 
  /**
-  * Create an instance of StationShort given an JSON string
+  * Create an instance of Cargo given an JSON string
   *
   * @param jsonString JSON string
-  * @return An instance of StationShort
-  * @throws IOException if the JSON string is invalid with respect to StationShort
+  * @return An instance of Cargo
+  * @throws IOException if the JSON string is invalid with respect to Cargo
   */
-  public static StationShort fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, StationShort.class);
+  public static Cargo fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, Cargo.class);
   }
 
  /**
-  * Convert an instance of StationShort to an JSON string
+  * Convert an instance of Cargo to an JSON string
   *
   * @return JSON string
   */

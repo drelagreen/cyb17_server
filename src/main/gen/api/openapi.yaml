@@ -6,20 +6,6 @@ info:
 servers:
 - url: http://0.0.0.0:8080
 paths:
-  /:
-    get:
-      responses:
-        "200":
-          content:
-            text/plain:
-              examples:
-                Example#1:
-                  value: Hello World!
-              schema:
-                type: string
-          description: OK
-      summary: Hello World!
-      x-accepts: text/plain
   /stations:
     get:
       responses:
@@ -99,8 +85,101 @@ paths:
           description: Bad Request
       summary: Get information about a specific way
       x-accepts: application/json
+  /wagon/{id}:
+    get:
+      parameters:
+      - description: ID of the wagon to retrieve
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WagonResponse'
+          description: Successful response
+        "400":
+          description: Bad request
+        "404":
+          description: Wagon not found
+      summary: Get wagon by ID
+      x-accepts: application/json
 components:
   schemas:
+    WagonResponse:
+      example:
+        isSick: true
+        owner: owner
+        idleDaysLength: 1
+        note2: note2
+        operationState: operationState
+        isWithHatch: true
+        type: type
+        parkId: 7
+        wayId: 3
+        inventoryNumber: inventoryNumber
+        isDirty: true
+        daysToRepair: 5
+        loadCapacity: 5.962133916683182
+        id: 0
+        position: 6
+        cargo:
+          cargoType: cargoType
+        kilometersLeft: 2
+        note1: note1
+        stationId: 9
+      properties:
+        id:
+          type: integer
+        inventoryNumber:
+          type: string
+        position:
+          type: integer
+        type:
+          type: string
+        isSick:
+          type: boolean
+        cargo:
+          $ref: '#/components/schemas/Cargo'
+        operationState:
+          type: string
+        idleDaysLength:
+          type: integer
+        owner:
+          type: string
+        isWithHatch:
+          type: boolean
+        loadCapacity:
+          type: number
+        daysToRepair:
+          type: integer
+        kilometersLeft:
+          type: integer
+        isDirty:
+          type: boolean
+        note1:
+          type: string
+        note2:
+          type: string
+        parkId:
+          type: integer
+        stationId:
+          type: integer
+        wayId:
+          type: integer
+      type: object
+    Cargo:
+      example:
+        cargoType: cargoType
+      properties:
+        cargoType:
+          type: string
+      type: object
     StationShort:
       example:
         id: 0
@@ -172,10 +251,10 @@ components:
         locomotives:
         - inventoryNumber: inventoryNumber
           id: 1
-          direction: FORWARD
+          direction: LEFT
         - inventoryNumber: inventoryNumber
           id: 1
-          direction: FORWARD
+          direction: LEFT
         parkId: 6
       properties:
         id:
@@ -201,7 +280,7 @@ components:
       example:
         inventoryNumber: inventoryNumber
         id: 1
-        direction: FORWARD
+        direction: LEFT
       properties:
         id:
           type: integer
@@ -209,8 +288,8 @@ components:
           type: string
         direction:
           enum:
-          - FORWARD
-          - BACKWARD
+          - LEFT
+          - RIGHT
           type: string
       type: object
 

@@ -1,4 +1,4 @@
-package ru.xyecos.domain.responses
+package ru.xyecos.domain
 
 data class Park(
     val id: Int,

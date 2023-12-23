@@ -8,11 +8,203 @@ servers:
 paths:
   /wagon/{id}:
     get:
-      summary: Get wagon by ID
+      summary: Get information about a specific wagon
       parameters:
         - name: id
           in: path
-          description: ID of the wagon to retrieve
+          required: true
+          schema:
+            type: integer
+          description: ID of the wagon
+      responses:
+        '200':
+          description: Successful response. Wagon information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wagon'
+        '400':
+          description: Bad request
+        '404':
+          description: Wagon not found
+  /way/{id}:
+    get:
+      summary: Get information about a specific way
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the way. Way information
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Way'
+        '400':
+          description: Bad request
+        '404':
+          description: Way not found
+  /park/{id}:
+    get:
+      summary: Get information about a specific park
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the park
+      responses:
+        '200':
+          description: Successful response. Park information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Park'
+        '400':
+          description: Bad request
+        '404':
+          description: Park not found
+  /stations/{id}:
+    get:
+      summary: Get information about a specific station
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the station
+      responses:
+        '200':
+          description: Successful response. Station information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+        '400':
+          description: Bad request
+        '404':
+          description: Station not found
+  /stations:
+    get:
+      summary: Get a list of stations
+      responses:
+        '200':
+          description: Successful response. List of stations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Station'
+
+  /forms/createForm:
+    get:
+      summary: Create a new form
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormCreated'
+
+  /forms/wagonMove:
+    post:
+      summary: Record a wagon move form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WagonMove'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '500':
+          description: Internal Server Error
+  /forms/formReview:
+    post:
+      summary: Review a form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FormReviewResult'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '500':
+          description: Internal Server Error
+  /forms:
+    get:
+      summary: Get forms
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FormStatus'
+        '500':
+          description: Internal Server Error
+  /forms/openedForms:
+    get:
+      summary: Get opened forms
+      responses:
+        '200':
+          description: Successful response. List of form IDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+        '500':
+          description: Internal Server Error
+  /forms/formStatus/{id}:
+    get:
+      summary: Get form status by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the form
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response. Form status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+  /forms/shadowMerge/{id}:
+    get:
+      summary: Retrieve Shadow Merge Results
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the form
           required: true
           schema:
             type: integer
@@ -22,98 +214,138 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WagonResponse'
+                $ref: '#/components/schemas/ShadowMergeResults'
         '400':
-          description: Bad request
+          description: Bad Request
         '404':
-          description: Wagon not found
-  /:
-    get:
-      summary: "Hello World!"
-      responses:
-        '200':
-          description: "OK"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Hello World!"
-  /stations:
-    get:
-      summary: "Get a list of stations"
-      responses:
-        '200':
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/StationShort"
-  /stations/{id}:
-    get:
-      summary: "Get information about a specific station"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-          description: "Station ID"
-      responses:
-        '200':
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Station"
-        '400':
-          description: "Bad Request"
-  /park/{id}:
-    get:
-      summary: "Get information about a specific park"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-          description: "Park ID"
-      responses:
-        '200':
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Park"
-        '400':
-          description: "Bad Request"
-  /way/{id}:
-    get:
-      summary: "Get information about a specific way"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-          description: "Way ID"
-      responses:
-        '200':
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Way"
-        '400':
-          description: "Bad Request"
+          description: Not Found
 components:
   schemas:
-    WagonResponse:
+    ShadowMergeResults:
       type: object
       properties:
+        ways:
+          type: array
+          items:
+            $ref: '#/components/schemas/Way'
+        wagons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Wagon'
+    WagonMove:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          description: The timestamp of the form
+        formId:
+          type: integer
+          description: The ID of the form
+        departureStation:
+          type: integer
+          description: The ID of the departure station
+        departurePark:
+          type: integer
+          description: The ID of the departure park
+        departureWay:
+          type: integer
+          description: The ID of the departure way
+        destinationStation:
+          type: integer
+          description: The ID of the destination station
+        destinationPark:
+          type: integer
+          description: The ID of the destination park
+        destinationWay:
+          type: integer
+          description: The ID of the destination way
+        locomotives:
+          type: array
+          items:
+            type: integer
+          description: List of locomotive IDs
+        wagons:
+          type: array
+          items:
+            type: integer
+          description: List of wagon IDs
+        comment:
+          type: string
+          description: Additional comment
+        operationInitiator:
+          type: string
+          description: The initiator of the operation
+        reasonId:
+          type: integer
+          description: The ID of the reason
+        needAcceptance:
+          type: boolean
+          description: Indicates if acceptance is needed
+        deviationMinutes:
+          type: string
+          description: Deviation in minutes
+    FormReviewResult:
+      type: object
+      properties:
+        formId:
+          type: integer
+          description: The ID of the form
+        accepted:
+          type: boolean
+          description: Indicates whether the form is accepted
+        reviewerId:
+          type: integer
+          description: The ID of the reviewer
+        comment:
+          type: string
+          description: Reviewer's comment
+        timestamp:
+          type: integer
+          description: The timestamp of the review result
+    FormStatus:
+      type: object
+      properties:
+        formId:
+          type: integer
+          description: The ID of the form
+        status:
+          type: string
+          enum:
+            - CREATION
+            - OPEN
+            - ACCEPTED
+            - DECLINED
+            - NONE
+          description: The status of the form
+    Station:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the station
+        title:
+          type: string
+          description: Title of the station
+        isLoginStation:
+          type: boolean
+          description: Indicates if it's a login station
+        parksCount:
+          type: integer
+          description: Count of parks
+        parksIds:
+          type: array
+          items:
+            type: integer
+          description: List of park IDs
+    Wagon:
+      type: object
+      properties:
+        wayId:
+          type: integer
+        parkId:
+          type: integer
+        stationId:
+          type: integer
         id:
           type: integer
         inventoryNumber:
@@ -125,7 +357,7 @@ components:
         isSick:
           type: boolean
         cargo:
-          $ref: '#/components/schemas/Cargo'
+          type: string
         operationState:
           type: string
         idleDaysLength:
@@ -146,88 +378,105 @@ components:
           type: string
         note2:
           type: string
-        parkId:
-          type: integer
-        stationId:
-          type: integer
-        wayId:
-          type: integer
-    Cargo:
+      required:
+        - wayId
+        - parkId
+        - stationId
+        - id
+        - inventoryNumber
+        - position
+        - type
+        - isSick
+        - cargo
+        - operationState
+        - idleDaysLength
+        - owner
+        - isWithHatch
+        - loadCapacity
+        - daysToRepair
+        - kilometersLeft
+        - isDirty
+        - note1
+        - note2
+    Park:
       type: object
       properties:
-        cargoType:
-          type: string
-    StationShort:
-      type: "object"
-      properties:
         id:
-          type: "integer"
-        title:
-          type: "string"
-        isLoginStation:
-          type: "boolean"
-    Station:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-        title:
-          type: "string"
-        isLoginStation:
-          type: "boolean"
-        parksCount:
-          type: "integer"
-        parksIds:
-          type: "array"
-          items:
-            type: "integer"
-    Park:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
+          type: integer
         stationId:
-          type: "integer"
+          type: integer
         name:
-          type: "string"
+          type: string
         waysCount:
-          type: "integer"
+          type: integer
         waysIds:
-          type: "array"
+          type: array
           items:
-            type: "integer"
+            type: integer
+      required:
+        - id
+        - stationId
+        - name
+        - waysCount
+        - waysIds
     Way:
-      type: "object"
+      type: object
       properties:
         id:
-          type: "integer"
+          type: integer
         parkId:
-          type: "integer"
+          type: integer
+        stationId:
+          type: integer
         name:
-          type: "string"
-        locomotives:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Locomotive"
-        wagonsCount:
-          type: "integer"
-        wagonsIds:
-          type: "array"
-          items:
-            type: "integer"
+          type: string
         maxCarriagesCount:
-          type: "integer"
+          type: integer
+        locomotives:
+          type: array
+          items:
+            $ref: '#/components/schemas/Locomotive'
+        wagonsCount:
+          type: integer
+        wagonsIds:
+          type: array
+          items:
+            type: integer
+      required:
+        - id
+        - parkId
+        - stationId
+        - name
+        - maxCarriagesCount
+        - locomotives
+        - wagonsCount
+        - wagonsIds
     Locomotive:
-      type: "object"
+      type: object
       properties:
         id:
-          type: "integer"
+          type: integer
         inventoryNumber:
-          type: "string"
+          type: string
         direction:
-          type: "string"
-          enum:
-            - "LEFT"
-            - "RIGHT"
+          $ref: '#/components/schemas/Direction'
+      required:
+        - id
+        - inventoryNumber
+        - direction
+
+    Direction:
+      type: string
+      enum:
+        - LEFT
+        - RIGHT
+    FormCreated:
+      type: object
+      properties:
+        formId:
+          type: integer
+        timestamp:
+          type: integer
+
 
 

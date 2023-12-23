@@ -47,7 +47,7 @@ import org.openapitools.client.JSON;
 /**
  * Locomotive
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-12-22T22:15:41.762441+03:00[Europe/Moscow]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-12-23T05:23:19.175324+03:00[Europe/Moscow]")
 public class Locomotive {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
@@ -62,9 +62,9 @@ public class Locomotive {
    */
   @JsonAdapter(DirectionEnum.Adapter.class)
   public enum DirectionEnum {
-    FORWARD("FORWARD"),
+    LEFT("LEFT"),
     
-    BACKWARD("BACKWARD");
+    RIGHT("RIGHT");
 
     private String value;
 

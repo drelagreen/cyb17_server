@@ -1,4 +1,4 @@
-package ru.xyecos.domain.responses
+package ru.xyecos.domain
 
 data class Way(
     val id: Int,

@@ -42,6 +42,7 @@ dependencies {
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
 }
 kotlin {
     jvmToolchain(11)

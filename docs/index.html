@@ -689,15 +689,62 @@
   <script>
     // Script section to load models into a JS Var
     var defs = {}
-            defs["Cargo"] = {
+            defs["Direction"] = {
+  "type" : "string",
+  "enum" : [ "LEFT", "RIGHT" ]
+};
+            defs["FormCreated"] = {
   "type" : "object",
   "properties" : {
-    "cargoType" : {
-      "type" : "string"
+    "formId" : {
+      "type" : "integer"
+    },
+    "timestamp" : {
+      "type" : "integer"
+    }
+  }
+};
+            defs["FormReviewResult"] = {
+  "type" : "object",
+  "properties" : {
+    "formId" : {
+      "type" : "integer",
+      "description" : "The ID of the form"
+    },
+    "accepted" : {
+      "type" : "boolean",
+      "description" : "Indicates whether the form is accepted"
+    },
+    "reviewerId" : {
+      "type" : "integer",
+      "description" : "The ID of the reviewer"
+    },
+    "comment" : {
+      "type" : "string",
+      "description" : "Reviewer's comment"
+    },
+    "timestamp" : {
+      "type" : "integer",
+      "description" : "The timestamp of the review result"
+    }
+  }
+};
+            defs["FormStatus"] = {
+  "type" : "object",
+  "properties" : {
+    "formId" : {
+      "type" : "integer",
+      "description" : "The ID of the form"
+    },
+    "status" : {
+      "type" : "string",
+      "description" : "The status of the form",
+      "enum" : [ "CREATION", "OPEN", "ACCEPTED", "DECLINED", "NONE" ]
     }
   }
 };
             defs["Locomotive"] = {
+  "required" : [ "direction", "id", "inventoryNumber" ],
   "type" : "object",
   "properties" : {
     "id" : {
@@ -707,12 +754,12 @@
       "type" : "string"
     },
     "direction" : {
-      "type" : "string",
-      "enum" : [ "LEFT", "RIGHT" ]
+      "$ref" : "#/components/schemas/Direction"
     }
   }
 };
             defs["Park"] = {
+  "required" : [ "id", "name", "stationId", "waysCount", "waysIds" ],
   "type" : "object",
   "properties" : {
     "id" : {
@@ -735,46 +782,64 @@
     }
   }
 };
+            defs["ShadowMergeResults"] = {
+  "type" : "object",
+  "properties" : {
+    "ways" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/Way"
+      }
+    },
+    "wagons" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/Wagon"
+      }
+    }
+  }
+};
             defs["Station"] = {
   "type" : "object",
   "properties" : {
     "id" : {
-      "type" : "integer"
+      "type" : "integer",
+      "description" : "ID of the station"
     },
     "title" : {
-      "type" : "string"
+      "type" : "string",
+      "description" : "Title of the station"
     },
     "isLoginStation" : {
-      "type" : "boolean"
+      "type" : "boolean",
+      "description" : "Indicates if it's a login station"
     },
     "parksCount" : {
-      "type" : "integer"
+      "type" : "integer",
+      "description" : "Count of parks"
     },
     "parksIds" : {
       "type" : "array",
+      "description" : "List of park IDs",
       "items" : {
         "type" : "integer"
       }
     }
   }
 };
-            defs["StationShort"] = {
+            defs["Wagon"] = {
+  "required" : [ "cargo", "daysToRepair", "id", "idleDaysLength", "inventoryNumber", "isDirty", "isSick", "isWithHatch", "kilometersLeft", "loadCapacity", "note1", "note2", "operationState", "owner", "parkId", "position", "stationId", "type", "wayId" ],
   "type" : "object",
   "properties" : {
-    "id" : {
+    "wayId" : {
       "type" : "integer"
     },
-    "title" : {
-      "type" : "string"
+    "parkId" : {
+      "type" : "integer"
     },
-    "isLoginStation" : {
-      "type" : "boolean"
-    }
-  }
-};
-            defs["WagonResponse"] = {
-  "type" : "object",
-  "properties" : {
+    "stationId" : {
+      "type" : "integer"
+    },
     "id" : {
       "type" : "integer"
     },
@@ -791,7 +856,7 @@
       "type" : "boolean"
     },
     "cargo" : {
-      "$ref" : "#/components/schemas/Cargo"
+      "type" : "string"
     },
     "operationState" : {
       "type" : "string"
@@ -822,19 +887,82 @@
     },
     "note2" : {
       "type" : "string"
+    }
+  }
+};
+            defs["WagonMove"] = {
+  "type" : "object",
+  "properties" : {
+    "timestamp" : {
+      "type" : "integer",
+      "description" : "The timestamp of the form"
     },
-    "parkId" : {
-      "type" : "integer"
+    "formId" : {
+      "type" : "integer",
+      "description" : "The ID of the form"
     },
-    "stationId" : {
-      "type" : "integer"
+    "departureStation" : {
+      "type" : "integer",
+      "description" : "The ID of the departure station"
     },
-    "wayId" : {
-      "type" : "integer"
+    "departurePark" : {
+      "type" : "integer",
+      "description" : "The ID of the departure park"
+    },
+    "departureWay" : {
+      "type" : "integer",
+      "description" : "The ID of the departure way"
+    },
+    "destinationStation" : {
+      "type" : "integer",
+      "description" : "The ID of the destination station"
+    },
+    "destinationPark" : {
+      "type" : "integer",
+      "description" : "The ID of the destination park"
+    },
+    "destinationWay" : {
+      "type" : "integer",
+      "description" : "The ID of the destination way"
+    },
+    "locomotives" : {
+      "type" : "array",
+      "description" : "List of locomotive IDs",
+      "items" : {
+        "type" : "integer"
+      }
+    },
+    "wagons" : {
+      "type" : "array",
+      "description" : "List of wagon IDs",
+      "items" : {
+        "type" : "integer"
+      }
+    },
+    "comment" : {
+      "type" : "string",
+      "description" : "Additional comment"
+    },
+    "operationInitiator" : {
+      "type" : "string",
+      "description" : "The initiator of the operation"
+    },
+    "reasonId" : {
+      "type" : "integer",
+      "description" : "The ID of the reason"
+    },
+    "needAcceptance" : {
+      "type" : "boolean",
+      "description" : "Indicates if acceptance is needed"
+    },
+    "deviationMinutes" : {
+      "type" : "string",
+      "description" : "Deviation in minutes"
     }
   }
 };
             defs["Way"] = {
+  "required" : [ "id", "locomotives", "maxCarriagesCount", "name", "parkId", "stationId", "wagonsCount", "wagonsIds" ],
   "type" : "object",
   "properties" : {
     "id" : {
@@ -843,8 +971,14 @@
     "parkId" : {
       "type" : "integer"
     },
+    "stationId" : {
+      "type" : "integer"
+    },
     "name" : {
       "type" : "string"
+    },
+    "maxCarriagesCount" : {
+      "type" : "integer"
     },
     "locomotives" : {
       "type" : "array",
@@ -860,9 +994,6 @@
       "items" : {
         "type" : "integer"
       }
-    },
-    "maxCarriagesCount" : {
-      "type" : "integer"
     }
   }
 };
@@ -883,11 +1014,29 @@
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">API Summary</a></li>
 
                   <li class="nav-header" data-group="Default"><a href="#api-Default">API Methods - Default</a></li>
+                    <li data-group="Default" data-name="formsCreateFormGet" class="">
+                      <a href="#api-Default-formsCreateFormGet">formsCreateFormGet</a>
+                    </li>
+                    <li data-group="Default" data-name="formsFormReviewPost" class="">
+                      <a href="#api-Default-formsFormReviewPost">formsFormReviewPost</a>
+                    </li>
+                    <li data-group="Default" data-name="formsFormStatusIdGet" class="">
+                      <a href="#api-Default-formsFormStatusIdGet">formsFormStatusIdGet</a>
+                    </li>
+                    <li data-group="Default" data-name="formsGet" class="">
+                      <a href="#api-Default-formsGet">formsGet</a>
+                    </li>
+                    <li data-group="Default" data-name="formsOpenedFormsGet" class="">
+                      <a href="#api-Default-formsOpenedFormsGet">formsOpenedFormsGet</a>
+                    </li>
+                    <li data-group="Default" data-name="formsShadowMergeIdGet" class="">
+                      <a href="#api-Default-formsShadowMergeIdGet">formsShadowMergeIdGet</a>
+                    </li>
+                    <li data-group="Default" data-name="formsWagonMovePost" class="">
+                      <a href="#api-Default-formsWagonMovePost">formsWagonMovePost</a>
+                    </li>
                     <li data-group="Default" data-name="parkIdGet" class="">
                       <a href="#api-Default-parkIdGet">parkIdGet</a>
-                    </li>
-                    <li data-group="Default" data-name="rootGet" class="">
-                      <a href="#api-Default-rootGet">rootGet</a>
                     </li>
                     <li data-group="Default" data-name="stationsGet" class="">
                       <a href="#api-Default-stationsGet">stationsGet</a>
@@ -922,6 +1071,1988 @@
         <div id="sections">
                 <section id="api-Default">
                   <h1>Default</h1>
+                    <div id="api-Default-formsCreateFormGet">
+                      <article id="api-Default-formsCreateFormGet-0" data-group="User" data-name="formsCreateFormGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsCreateFormGet</h1>
+                          <p>Create a new form</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/forms/createForm</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsCreateFormGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsCreateFormGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsCreateFormGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsCreateFormGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsCreateFormGet-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+-H "Accept: application/json"\
+"http://0.0.0.0:8080/forms/createForm"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        try {
+            FormCreated result = apiInstance.formsCreateFormGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsCreateFormGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        try {
+            FormCreated result = apiInstance.formsCreateFormGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsCreateFormGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Create a new form
+[apiInstance formsCreateFormGetWithCompletionHandler: 
+              ^(FormCreated output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.formsCreateFormGet(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsCreateFormGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsCreateFormGetExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+
+            try
+            {
+                // Create a new form
+                FormCreated result = apiInstance.formsCreateFormGet();
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsCreateFormGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+
+try {
+    $result = $api_instance->formsCreateFormGet();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsCreateFormGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+
+eval { 
+    my $result = $api_instance->formsCreateFormGet();
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsCreateFormGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsCreateFormGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+
+try: 
+    # Create a new form
+    api_response = api_instance.forms_create_form_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsCreateFormGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-formsCreateFormGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-formsCreateFormGet-200-schema">
+                                  <div id='responses-formsCreateFormGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Successful response",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/FormCreated"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-formsCreateFormGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-formsCreateFormGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-formsCreateFormGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Default-formsFormReviewPost">
+                      <article id="api-Default-formsFormReviewPost-0" data-group="User" data-name="formsFormReviewPost" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsFormReviewPost</h1>
+                          <p>Review a form</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/forms/formReview</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsFormReviewPost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsFormReviewPost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsFormReviewPost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsFormReviewPost-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsFormReviewPost-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X POST\
+-H "Content-Type: application/json"\
+"http://0.0.0.0:8080/forms/formReview"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        FormReviewResult body = ; // FormReviewResult | 
+        try {
+            apiInstance.formsFormReviewPost(body);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsFormReviewPost");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        FormReviewResult body = ; // FormReviewResult | 
+        try {
+            apiInstance.formsFormReviewPost(body);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsFormReviewPost");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">FormReviewResult *body = ; // 
+
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Review a form
+[apiInstance formsFormReviewPostWith:body
+              completionHandler: ^(NSError* error) {
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var body = ; // {{FormReviewResult}} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.formsFormReviewPost(body, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsFormReviewPost-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsFormReviewPostExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+            var body = new FormReviewResult(); // FormReviewResult | 
+
+            try
+            {
+                // Review a form
+                apiInstance.formsFormReviewPost(body);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsFormReviewPost: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+$body = ; // FormReviewResult | 
+
+try {
+    $api_instance->formsFormReviewPost($body);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsFormReviewPost: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+my $body = WWW::SwaggerClient::Object::FormReviewResult->new(); # FormReviewResult | 
+
+eval { 
+    $api_instance->formsFormReviewPost(body => $body);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsFormReviewPost: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormReviewPost-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+body =  # FormReviewResult | 
+
+try: 
+    # Review a form
+    api_instance.forms_form_review_post(body)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsFormReviewPost: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+                                <td>
+                                
+                                
+                                <script>
+                                $(document).ready(function() {
+                                  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/FormReviewResult"
+      }
+    }
+  },
+  "required" : true
+};
+                                  var schema = schemaWrapper.content["application/json"].schema;
+                                  if (schema.$ref != null) {
+                                    schema = defsParser.$refs.get(schema.$ref);
+                                  } else {
+                                    schemaWrapper.components = {};
+                                    schemaWrapper.components.schemas = Object.assign({}, defs);
+                                    $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                      console.log(err);
+                                    });
+                                  }
+                                
+                                  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+                                  var result = $('#d2e199_formsFormReviewPost_body');
+                                  result.empty();
+                                  result.append(view.render());
+                                });
+                                </script>
+                                <div id="d2e199_formsFormReviewPost_body"></div>
+                                </td>
+                                </tr>
+                            </table>
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 400 - Bad request </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 500 - Internal Server Error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Default-formsFormStatusIdGet">
+                      <article id="api-Default-formsFormStatusIdGet-0" data-group="User" data-name="formsFormStatusIdGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsFormStatusIdGet</h1>
+                          <p>Get form status by ID</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/forms/formStatus/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsFormStatusIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsFormStatusIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsFormStatusIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsFormStatusIdGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsFormStatusIdGet-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+-H "Accept: application/json"\
+"http://0.0.0.0:8080/forms/formStatus/{id}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        Integer id = 56; // Integer | ID of the form
+        try {
+            Object result = apiInstance.formsFormStatusIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsFormStatusIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        Integer id = 56; // Integer | ID of the form
+        try {
+            Object result = apiInstance.formsFormStatusIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsFormStatusIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // ID of the form
+
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Get form status by ID
+[apiInstance formsFormStatusIdGetWith:id
+              completionHandler: ^(Object output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var id = 56; // {{Integer}} ID of the form
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.formsFormStatusIdGet(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsFormStatusIdGetExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+            var id = 56;  // Integer | ID of the form
+
+            try
+            {
+                // Get form status by ID
+                Object result = apiInstance.formsFormStatusIdGet(id);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsFormStatusIdGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+$id = 56; // Integer | ID of the form
+
+try {
+    $result = $api_instance->formsFormStatusIdGet($id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsFormStatusIdGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+my $id = 56; # Integer | ID of the form
+
+eval { 
+    my $result = $api_instance->formsFormStatusIdGet(id => $id);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsFormStatusIdGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsFormStatusIdGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+id = 56 # Integer | ID of the form
+
+try: 
+    # Get form status by ID
+    api_response = api_instance.forms_form_status_id_get(id)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsFormStatusIdGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_formsFormStatusIdGet_id">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      Integer
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          ID of the form
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response. Form status </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-formsFormStatusIdGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-formsFormStatusIdGet-200-schema">
+                                  <div id='responses-formsFormStatusIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Successful response. Form status",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string"
+          }
+        },
+        "x-content-type" : "application/json"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-formsFormStatusIdGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-formsFormStatusIdGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-formsFormStatusIdGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 400 - Bad Request </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 404 - Not Found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Default-formsGet">
+                      <article id="api-Default-formsGet-0" data-group="User" data-name="formsGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsGet</h1>
+                          <p>Get forms</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/forms</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsGet-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+-H "Accept: application/json"\
+"http://0.0.0.0:8080/forms"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        try {
+            array[FormStatus] result = apiInstance.formsGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        try {
+            array[FormStatus] result = apiInstance.formsGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Get forms
+[apiInstance formsGetWithCompletionHandler: 
+              ^(array[FormStatus] output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.formsGet(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsGetExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+
+            try
+            {
+                // Get forms
+                array[FormStatus] result = apiInstance.formsGet();
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+
+try {
+    $result = $api_instance->formsGet();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+
+eval { 
+    my $result = $api_instance->formsGet();
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+
+try: 
+    # Get forms
+    api_response = api_instance.forms_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-formsGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-formsGet-200-schema">
+                                  <div id='responses-formsGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Successful response",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/FormStatus"
+        },
+        "x-content-type" : "application/json"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-formsGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-formsGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-formsGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 500 - Internal Server Error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Default-formsOpenedFormsGet">
+                      <article id="api-Default-formsOpenedFormsGet-0" data-group="User" data-name="formsOpenedFormsGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsOpenedFormsGet</h1>
+                          <p>Get opened forms</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/forms/openedForms</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsOpenedFormsGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsOpenedFormsGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsOpenedFormsGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsOpenedFormsGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsOpenedFormsGet-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+-H "Accept: application/json"\
+"http://0.0.0.0:8080/forms/openedForms"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        try {
+            array['Integer'] result = apiInstance.formsOpenedFormsGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsOpenedFormsGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        try {
+            array['Integer'] result = apiInstance.formsOpenedFormsGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsOpenedFormsGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Get opened forms
+[apiInstance formsOpenedFormsGetWithCompletionHandler: 
+              ^(array['Integer'] output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.formsOpenedFormsGet(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsOpenedFormsGetExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+
+            try
+            {
+                // Get opened forms
+                array['Integer'] result = apiInstance.formsOpenedFormsGet();
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsOpenedFormsGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+
+try {
+    $result = $api_instance->formsOpenedFormsGet();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsOpenedFormsGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+
+eval { 
+    my $result = $api_instance->formsOpenedFormsGet();
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsOpenedFormsGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsOpenedFormsGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+
+try: 
+    # Get opened forms
+    api_response = api_instance.forms_opened_forms_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsOpenedFormsGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response. List of form IDs </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-formsOpenedFormsGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-formsOpenedFormsGet-200-schema">
+                                  <div id='responses-formsOpenedFormsGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Successful response. List of form IDs",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "type" : "array",
+        "items" : {
+          "type" : "integer"
+        },
+        "x-content-type" : "application/json"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-formsOpenedFormsGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-formsOpenedFormsGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-formsOpenedFormsGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 500 - Internal Server Error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Default-formsShadowMergeIdGet">
+                      <article id="api-Default-formsShadowMergeIdGet-0" data-group="User" data-name="formsShadowMergeIdGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsShadowMergeIdGet</h1>
+                          <p>Retrieve Shadow Merge Results</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/forms/shadowMerge/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsShadowMergeIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsShadowMergeIdGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsShadowMergeIdGet-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+-H "Accept: application/json"\
+"http://0.0.0.0:8080/forms/shadowMerge/{id}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        Integer id = 56; // Integer | The ID of the form
+        try {
+            ShadowMergeResults result = apiInstance.formsShadowMergeIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsShadowMergeIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        Integer id = 56; // Integer | The ID of the form
+        try {
+            ShadowMergeResults result = apiInstance.formsShadowMergeIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsShadowMergeIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // The ID of the form
+
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Retrieve Shadow Merge Results
+[apiInstance formsShadowMergeIdGetWith:id
+              completionHandler: ^(ShadowMergeResults output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var id = 56; // {{Integer}} The ID of the form
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.formsShadowMergeIdGet(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsShadowMergeIdGetExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+            var id = 56;  // Integer | The ID of the form
+
+            try
+            {
+                // Retrieve Shadow Merge Results
+                ShadowMergeResults result = apiInstance.formsShadowMergeIdGet(id);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsShadowMergeIdGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+$id = 56; // Integer | The ID of the form
+
+try {
+    $result = $api_instance->formsShadowMergeIdGet($id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsShadowMergeIdGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+my $id = 56; # Integer | The ID of the form
+
+eval { 
+    my $result = $api_instance->formsShadowMergeIdGet(id => $id);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsShadowMergeIdGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsShadowMergeIdGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+id = 56 # Integer | The ID of the form
+
+try: 
+    # Retrieve Shadow Merge Results
+    api_response = api_instance.forms_shadow_merge_id_get(id)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsShadowMergeIdGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_formsShadowMergeIdGet_id">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      Integer
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          The ID of the form
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-formsShadowMergeIdGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-formsShadowMergeIdGet-200-schema">
+                                  <div id='responses-formsShadowMergeIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Successful response",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/ShadowMergeResults"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-formsShadowMergeIdGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-formsShadowMergeIdGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-formsShadowMergeIdGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 400 - Bad Request </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 404 - Not Found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Default-formsWagonMovePost">
+                      <article id="api-Default-formsWagonMovePost-0" data-group="User" data-name="formsWagonMovePost" data-version="0">
+                        <div class="pull-left">
+                          <h1>formsWagonMovePost</h1>
+                          <p>Record a wagon move form</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/forms/wagonMove</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Default-formsWagonMovePost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsWagonMovePost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-formsWagonMovePost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-formsWagonMovePost-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Default-formsWagonMovePost-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X POST\
+-H "Content-Type: application/json"\
+"http://0.0.0.0:8080/forms/wagonMove"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        WagonMove body = ; // WagonMove | 
+        try {
+            apiInstance.formsWagonMovePost(body);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsWagonMovePost");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        WagonMove body = ; // WagonMove | 
+        try {
+            apiInstance.formsWagonMovePost(body);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#formsWagonMovePost");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">WagonMove *body = ; // 
+
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// Record a wagon move form
+[apiInstance formsWagonMovePostWith:body
+              completionHandler: ^(NSError* error) {
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
+
+var api = new RailwayStationApi.DefaultApi()
+var body = ; // {{WagonMove}} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.formsWagonMovePost(body, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Default-formsWagonMovePost-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class formsWagonMovePostExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+            var body = new WagonMove(); // WagonMove | 
+
+            try
+            {
+                // Record a wagon move form
+                apiInstance.formsWagonMovePost(body);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.formsWagonMovePost: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+$body = ; // WagonMove | 
+
+try {
+    $api_instance->formsWagonMovePost($body);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->formsWagonMovePost: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+my $body = WWW::SwaggerClient::Object::WagonMove->new(); # WagonMove | 
+
+eval { 
+    $api_instance->formsWagonMovePost(body => $body);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->formsWagonMovePost: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Default-formsWagonMovePost-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+body =  # WagonMove | 
+
+try: 
+    # Record a wagon move form
+    api_instance.forms_wagon_move_post(body)
+except ApiException as e:
+    print("Exception when calling DefaultApi->formsWagonMovePost: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+                                <td>
+                                
+                                
+                                <script>
+                                $(document).ready(function() {
+                                  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/WagonMove"
+      }
+    }
+  },
+  "required" : true
+};
+                                  var schema = schemaWrapper.content["application/json"].schema;
+                                  if (schema.$ref != null) {
+                                    schema = defsParser.$refs.get(schema.$ref);
+                                  } else {
+                                    schemaWrapper.components = {};
+                                    schemaWrapper.components.schemas = Object.assign({}, defs);
+                                    $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                      console.log(err);
+                                    });
+                                  }
+                                
+                                  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+                                  var result = $('#d2e199_formsWagonMovePost_body');
+                                  result.empty();
+                                  result.append(view.render());
+                                });
+                                </script>
+                                <div id="d2e199_formsWagonMovePost_body"></div>
+                                </td>
+                                </tr>
+                            </table>
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Successful response </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 400 - Bad request </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 500 - Internal Server Error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
                     <div id="api-Default-parkIdGet">
                       <article id="api-Default-parkIdGet-0" data-group="User" data-name="parkIdGet" data-version="0">
                         <div class="pull-left">
@@ -972,7 +3103,7 @@ public class DefaultApiExample {
     public static void main(String[] args) {
         
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | Park ID
+        Integer id = 56; // Integer | ID of the park
         try {
             Park result = apiInstance.parkIdGet(id);
             System.out.println(result);
@@ -991,7 +3122,7 @@ public class DefaultApiExample {
 
     public static void main(String[] args) {
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | Park ID
+        Integer id = 56; // Integer | ID of the park
         try {
             Park result = apiInstance.parkIdGet(id);
             System.out.println(result);
@@ -1007,7 +3138,7 @@ public class DefaultApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples-Default-parkIdGet-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // Park ID
+                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // ID of the park
 
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
@@ -1028,7 +3159,7 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
 
 var api = new RailwayStationApi.DefaultApi()
-var id = 56; // {{Integer}} Park ID
+var id = 56; // {{Integer}} ID of the park
 
 var callback = function(error, data, response) {
   if (error) {
@@ -1059,7 +3190,7 @@ namespace Example
         {
 
             var apiInstance = new DefaultApi();
-            var id = 56;  // Integer | Park ID
+            var id = 56;  // Integer | ID of the park
 
             try
             {
@@ -1082,7 +3213,7 @@ namespace Example
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiDefaultApi();
-$id = 56; // Integer | Park ID
+$id = 56; // Integer | ID of the park
 
 try {
     $result = $api_instance->parkIdGet($id);
@@ -1099,7 +3230,7 @@ use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::DefaultApi;
 
 my $api_instance = WWW::SwaggerClient::DefaultApi->new();
-my $id = 56; # Integer | Park ID
+my $id = 56; # Integer | ID of the park
 
 eval { 
     my $result = $api_instance->parkIdGet(id => $id);
@@ -1119,7 +3250,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.DefaultApi()
-id = 56 # Integer | Park ID
+id = 56 # Integer | ID of the park
 
 try: 
     # Get information about a specific park
@@ -1150,7 +3281,7 @@ except ApiException as e:
                                                   </span>
                                   
                                                       <div class="inner description">
-                                                          Park ID
+                                                          ID of the park
                                                       </div>
                                               </div>
                                                   <div class="inner required">
@@ -1167,7 +3298,7 @@ except ApiException as e:
 
 
                           <h2>Responses</h2>
-                            <h3> Status: 200 - OK </h3>
+                            <h3> Status: 200 - Successful response. Park information </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
@@ -1182,7 +3313,7 @@ except ApiException as e:
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "OK",
+  "description" : "Successful response. Park information",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1215,7 +3346,7 @@ except ApiException as e:
                                 </div>
                             </div>
 
-                            <h3> Status: 400 - Bad Request </h3>
+                            <h3> Status: 400 - Bad request </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -1223,268 +3354,12 @@ except ApiException as e:
                             <div class="tab-content" style='margin-bottom: 10px;'>
                             </div>
 
-                        </article>
-                      </div>
-                      <hr>
-                    <div id="api-Default-rootGet">
-                      <article id="api-Default-rootGet-0" data-group="User" data-name="rootGet" data-version="0">
-                        <div class="pull-left">
-                          <h1>rootGet</h1>
-                          <p>Hello World!</p>
-                        </div>
-                        <div class="pull-right"></div>
-                        <div class="clearfix"></div>
-                        <p></p>
-                        <p class="marked"></p>
-                        <p></p>
-                        <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/</span></code></pre>
-                        <p>
-                          <h3>Usage and SDK Samples</h3>
-                        </p>
-                        <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Default-rootGet-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Default-rootGet-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Default-rootGet-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Default-rootGet-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Default-rootGet-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Default-rootGet-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Default-rootGet-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Default-rootGet-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Default-rootGet-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Default-rootGet-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Default-rootGet-0-python">Python</a></li>
-                        </ul>
-
-                        <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Default-rootGet-0-curl">
-                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
--H "Accept: text/plain"\
-"http://0.0.0.0:8080/"</code></pre>
-                          </div>
-                          <div class="tab-pane" id="examples-Default-rootGet-0-java">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
-import io.swagger.client.auth.*;
-import io.swagger.client.model.*;
-import io.swagger.client.api.DefaultApi;
-
-import java.io.File;
-import java.util.*;
-
-public class DefaultApiExample {
-
-    public static void main(String[] args) {
-        
-        DefaultApi apiInstance = new DefaultApi();
-        try {
-            'String' result = apiInstance.rootGet();
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling DefaultApi#rootGet");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-
-                          <div class="tab-pane" id="examples-Default-rootGet-0-android">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
-
-public class DefaultApiExample {
-
-    public static void main(String[] args) {
-        DefaultApi apiInstance = new DefaultApi();
-        try {
-            'String' result = apiInstance.rootGet();
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling DefaultApi#rootGet");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-  <!--
-  <div class="tab-pane" id="examples-Default-rootGet-0-groovy">
-  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-  </div> -->
-                            <div class="tab-pane" id="examples-Default-rootGet-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">
-DefaultApi *apiInstance = [[DefaultApi alloc] init];
-
-// Hello World!
-[apiInstance rootGetWithCompletionHandler: 
-              ^('String' output, NSError* error) {
-                            if (output) {
-                                NSLog(@"%@", output);
-                            }
-                            if (error) {
-                                NSLog(@"Error: %@", error);
-                            }
-                        }];
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Default-rootGet-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
-
-var api = new RailwayStationApi.DefaultApi()
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-api.rootGet(callback);
-</code></pre>
-                            </div>
-
-                            <!--<div class="tab-pane" id="examples-Default-rootGet-0-angular">
-              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-            </div>-->
-                            <div class="tab-pane" id="examples-Default-rootGet-0-csharp">
-                              <pre class="prettyprint"><code class="language-cs">using System;
-using System.Diagnostics;
-using IO.Swagger.Api;
-using IO.Swagger.Client;
-using IO.Swagger.Model;
-
-namespace Example
-{
-    public class rootGetExample
-    {
-        public void main()
-        {
-
-            var apiInstance = new DefaultApi();
-
-            try
-            {
-                // Hello World!
-                'String' result = apiInstance.rootGet();
-                Debug.WriteLine(result);
-            }
-            catch (Exception e)
-            {
-                Debug.Print("Exception when calling DefaultApi.rootGet: " + e.Message );
-            }
-        }
-    }
-}
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Default-rootGet-0-php">
-                              <pre class="prettyprint"><code class="language-php"><&#63;php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-$api_instance = new Swagger\Client\ApiDefaultApi();
-
-try {
-    $result = $api_instance->rootGet();
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling DefaultApi->rootGet: ', $e->getMessage(), PHP_EOL;
-}
-?></code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Default-rootGet-0-perl">
-                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
-use WWW::SwaggerClient::Configuration;
-use WWW::SwaggerClient::DefaultApi;
-
-my $api_instance = WWW::SwaggerClient::DefaultApi->new();
-
-eval { 
-    my $result = $api_instance->rootGet();
-    print Dumper($result);
-};
-if ($@) {
-    warn "Exception when calling DefaultApi->rootGet: $@\n";
-}</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Default-rootGet-0-python">
-                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
-import time
-import swagger_client
-from swagger_client.rest import ApiException
-from pprint import pprint
-
-# create an instance of the API class
-api_instance = swagger_client.DefaultApi()
-
-try: 
-    # Hello World!
-    api_response = api_instance.root_get()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling DefaultApi->rootGet: %s\n" % e)</code></pre>
-                            </div>
-                          </div>
-
-                          <h2>Parameters</h2>
-
-
-
-
-
-
-                          <h2>Responses</h2>
-                            <h3> Status: 200 - OK </h3>
+                            <h3> Status: 404 - Park not found </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-rootGet-200-schema">Schema</a>
-                                </li>
-
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-rootGet-200-schema">
-                                  <div id='responses-rootGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "OK",
-  "content" : {
-    "text/plain" : {
-      "schema" : {
-        "type" : "string",
-        "x-content-type" : "text/plain"
-      },
-      "examples" : {
-        "Example#1" : {
-          "value" : "Hello World!"
-        }
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["text/plain"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-rootGet-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-rootGet-200-schema-200');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-rootGet-200-schema-data' type='hidden' value=''></input>
-                                </div>
                             </div>
 
                         </article>
@@ -1541,7 +3416,7 @@ public class DefaultApiExample {
         
         DefaultApi apiInstance = new DefaultApi();
         try {
-            array[StationShort] result = apiInstance.stationsGet();
+            array[Station] result = apiInstance.stationsGet();
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DefaultApi#stationsGet");
@@ -1559,7 +3434,7 @@ public class DefaultApiExample {
     public static void main(String[] args) {
         DefaultApi apiInstance = new DefaultApi();
         try {
-            array[StationShort] result = apiInstance.stationsGet();
+            array[Station] result = apiInstance.stationsGet();
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DefaultApi#stationsGet");
@@ -1578,7 +3453,7 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
 // Get a list of stations
 [apiInstance stationsGetWithCompletionHandler: 
-              ^(array[StationShort] output, NSError* error) {
+              ^(array[Station] output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
                             }
@@ -1626,7 +3501,7 @@ namespace Example
             try
             {
                 // Get a list of stations
-                array[StationShort] result = apiInstance.stationsGet();
+                array[Station] result = apiInstance.stationsGet();
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -1697,7 +3572,7 @@ except ApiException as e:
 
 
                           <h2>Responses</h2>
-                            <h3> Status: 200 - OK </h3>
+                            <h3> Status: 200 - Successful response. List of stations </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
@@ -1712,13 +3587,13 @@ except ApiException as e:
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "OK",
+  "description" : "Successful response. List of stations",
   "content" : {
     "application/json" : {
       "schema" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/StationShort"
+          "$ref" : "#/components/schemas/Station"
         },
         "x-content-type" : "application/json"
       }
@@ -1802,7 +3677,7 @@ public class DefaultApiExample {
     public static void main(String[] args) {
         
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | Station ID
+        Integer id = 56; // Integer | ID of the station
         try {
             Station result = apiInstance.stationsIdGet(id);
             System.out.println(result);
@@ -1821,7 +3696,7 @@ public class DefaultApiExample {
 
     public static void main(String[] args) {
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | Station ID
+        Integer id = 56; // Integer | ID of the station
         try {
             Station result = apiInstance.stationsIdGet(id);
             System.out.println(result);
@@ -1837,7 +3712,7 @@ public class DefaultApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples-Default-stationsIdGet-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // Station ID
+                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // ID of the station
 
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
@@ -1858,7 +3733,7 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
 
 var api = new RailwayStationApi.DefaultApi()
-var id = 56; // {{Integer}} Station ID
+var id = 56; // {{Integer}} ID of the station
 
 var callback = function(error, data, response) {
   if (error) {
@@ -1889,7 +3764,7 @@ namespace Example
         {
 
             var apiInstance = new DefaultApi();
-            var id = 56;  // Integer | Station ID
+            var id = 56;  // Integer | ID of the station
 
             try
             {
@@ -1912,7 +3787,7 @@ namespace Example
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiDefaultApi();
-$id = 56; // Integer | Station ID
+$id = 56; // Integer | ID of the station
 
 try {
     $result = $api_instance->stationsIdGet($id);
@@ -1929,7 +3804,7 @@ use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::DefaultApi;
 
 my $api_instance = WWW::SwaggerClient::DefaultApi->new();
-my $id = 56; # Integer | Station ID
+my $id = 56; # Integer | ID of the station
 
 eval { 
     my $result = $api_instance->stationsIdGet(id => $id);
@@ -1949,7 +3824,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.DefaultApi()
-id = 56 # Integer | Station ID
+id = 56 # Integer | ID of the station
 
 try: 
     # Get information about a specific station
@@ -1980,7 +3855,7 @@ except ApiException as e:
                                                   </span>
                                   
                                                       <div class="inner description">
-                                                          Station ID
+                                                          ID of the station
                                                       </div>
                                               </div>
                                                   <div class="inner required">
@@ -1997,7 +3872,7 @@ except ApiException as e:
 
 
                           <h2>Responses</h2>
-                            <h3> Status: 200 - OK </h3>
+                            <h3> Status: 200 - Successful response. Station information </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
@@ -2012,7 +3887,7 @@ except ApiException as e:
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "OK",
+  "description" : "Successful response. Station information",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -2045,7 +3920,15 @@ except ApiException as e:
                                 </div>
                             </div>
 
-                            <h3> Status: 400 - Bad Request </h3>
+                            <h3> Status: 400 - Bad request </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 404 - Station not found </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -2060,7 +3943,7 @@ except ApiException as e:
                       <article id="api-Default-wagonIdGet-0" data-group="User" data-name="wagonIdGet" data-version="0">
                         <div class="pull-left">
                           <h1>wagonIdGet</h1>
-                          <p>Get wagon by ID</p>
+                          <p>Get information about a specific wagon</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -2106,9 +3989,9 @@ public class DefaultApiExample {
     public static void main(String[] args) {
         
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | ID of the wagon to retrieve
+        Integer id = 56; // Integer | ID of the wagon
         try {
-            WagonResponse result = apiInstance.wagonIdGet(id);
+            Wagon result = apiInstance.wagonIdGet(id);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DefaultApi#wagonIdGet");
@@ -2125,9 +4008,9 @@ public class DefaultApiExample {
 
     public static void main(String[] args) {
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | ID of the wagon to retrieve
+        Integer id = 56; // Integer | ID of the wagon
         try {
-            WagonResponse result = apiInstance.wagonIdGet(id);
+            Wagon result = apiInstance.wagonIdGet(id);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DefaultApi#wagonIdGet");
@@ -2141,13 +4024,13 @@ public class DefaultApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples-Default-wagonIdGet-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // ID of the wagon to retrieve
+                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // ID of the wagon
 
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
-// Get wagon by ID
+// Get information about a specific wagon
 [apiInstance wagonIdGetWith:id
-              completionHandler: ^(WagonResponse output, NSError* error) {
+              completionHandler: ^(Wagon output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
                             }
@@ -2162,7 +4045,7 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
 
 var api = new RailwayStationApi.DefaultApi()
-var id = 56; // {{Integer}} ID of the wagon to retrieve
+var id = 56; // {{Integer}} ID of the wagon
 
 var callback = function(error, data, response) {
   if (error) {
@@ -2193,12 +4076,12 @@ namespace Example
         {
 
             var apiInstance = new DefaultApi();
-            var id = 56;  // Integer | ID of the wagon to retrieve
+            var id = 56;  // Integer | ID of the wagon
 
             try
             {
-                // Get wagon by ID
-                WagonResponse result = apiInstance.wagonIdGet(id);
+                // Get information about a specific wagon
+                Wagon result = apiInstance.wagonIdGet(id);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -2216,7 +4099,7 @@ namespace Example
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiDefaultApi();
-$id = 56; // Integer | ID of the wagon to retrieve
+$id = 56; // Integer | ID of the wagon
 
 try {
     $result = $api_instance->wagonIdGet($id);
@@ -2233,7 +4116,7 @@ use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::DefaultApi;
 
 my $api_instance = WWW::SwaggerClient::DefaultApi->new();
-my $id = 56; # Integer | ID of the wagon to retrieve
+my $id = 56; # Integer | ID of the wagon
 
 eval { 
     my $result = $api_instance->wagonIdGet(id => $id);
@@ -2253,10 +4136,10 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.DefaultApi()
-id = 56 # Integer | ID of the wagon to retrieve
+id = 56 # Integer | ID of the wagon
 
 try: 
-    # Get wagon by ID
+    # Get information about a specific wagon
     api_response = api_instance.wagon_id_get(id)
     pprint(api_response)
 except ApiException as e:
@@ -2284,7 +4167,7 @@ except ApiException as e:
                                                   </span>
                                   
                                                       <div class="inner description">
-                                                          ID of the wagon to retrieve
+                                                          ID of the wagon
                                                       </div>
                                               </div>
                                                   <div class="inner required">
@@ -2301,7 +4184,7 @@ except ApiException as e:
 
 
                           <h2>Responses</h2>
-                            <h3> Status: 200 - Successful response </h3>
+                            <h3> Status: 200 - Successful response. Wagon information </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
@@ -2316,11 +4199,11 @@ except ApiException as e:
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Successful response",
+  "description" : "Successful response. Wagon information",
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/WagonResponse"
+        "$ref" : "#/components/schemas/Wagon"
       }
     }
   }
@@ -2418,7 +4301,7 @@ public class DefaultApiExample {
     public static void main(String[] args) {
         
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | Way ID
+        Integer id = 56; // Integer | ID of the way. Way information
         try {
             Way result = apiInstance.wayIdGet(id);
             System.out.println(result);
@@ -2437,7 +4320,7 @@ public class DefaultApiExample {
 
     public static void main(String[] args) {
         DefaultApi apiInstance = new DefaultApi();
-        Integer id = 56; // Integer | Way ID
+        Integer id = 56; // Integer | ID of the way. Way information
         try {
             Way result = apiInstance.wayIdGet(id);
             System.out.println(result);
@@ -2453,7 +4336,7 @@ public class DefaultApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples-Default-wayIdGet-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // Way ID
+                              <pre class="prettyprint"><code class="language-cpp">Integer *id = 56; // ID of the way. Way information
 
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
@@ -2474,7 +4357,7 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var RailwayStationApi = require('railway_station_api');
 
 var api = new RailwayStationApi.DefaultApi()
-var id = 56; // {{Integer}} Way ID
+var id = 56; // {{Integer}} ID of the way. Way information
 
 var callback = function(error, data, response) {
   if (error) {
@@ -2505,7 +4388,7 @@ namespace Example
         {
 
             var apiInstance = new DefaultApi();
-            var id = 56;  // Integer | Way ID
+            var id = 56;  // Integer | ID of the way. Way information
 
             try
             {
@@ -2528,7 +4411,7 @@ namespace Example
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiDefaultApi();
-$id = 56; // Integer | Way ID
+$id = 56; // Integer | ID of the way. Way information
 
 try {
     $result = $api_instance->wayIdGet($id);
@@ -2545,7 +4428,7 @@ use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::DefaultApi;
 
 my $api_instance = WWW::SwaggerClient::DefaultApi->new();
-my $id = 56; # Integer | Way ID
+my $id = 56; # Integer | ID of the way. Way information
 
 eval { 
     my $result = $api_instance->wayIdGet(id => $id);
@@ -2565,7 +4448,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.DefaultApi()
-id = 56 # Integer | Way ID
+id = 56 # Integer | ID of the way. Way information
 
 try: 
     # Get information about a specific way
@@ -2596,7 +4479,7 @@ except ApiException as e:
                                                   </span>
                                   
                                                       <div class="inner description">
-                                                          Way ID
+                                                          ID of the way. Way information
                                                       </div>
                                               </div>
                                                   <div class="inner required">
@@ -2613,7 +4496,7 @@ except ApiException as e:
 
 
                           <h2>Responses</h2>
-                            <h3> Status: 200 - OK </h3>
+                            <h3> Status: 200 - Successful response </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
@@ -2628,7 +4511,7 @@ except ApiException as e:
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "OK",
+  "description" : "Successful response",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -2661,7 +4544,15 @@ except ApiException as e:
                                 </div>
                             </div>
 
-                            <h3> Status: 400 - Bad Request </h3>
+                            <h3> Status: 400 - Bad request </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 404 - Way not found </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>

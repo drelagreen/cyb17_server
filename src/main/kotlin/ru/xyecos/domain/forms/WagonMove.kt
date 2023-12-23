@@ -1,6 +1,7 @@
 package ru.xyecos.domain.forms
 
 data class WagonMove(
+    val timestamp: Long,
     val formId: Int,
 
     val departureStation: Int,

@@ -17,8 +17,8 @@
 
 | Name | Value |
 |---- | -----|
-| FORWARD | &quot;FORWARD&quot; |
-| BACKWARD | &quot;BACKWARD&quot; |
+| LEFT | &quot;LEFT&quot; |
+| RIGHT | &quot;RIGHT&quot; |
 
 
 

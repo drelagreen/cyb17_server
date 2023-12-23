@@ -12,4 +12,8 @@ object FormsNotifier {
     fun notifyFormOpened(formId: Int) {
         _openedForms.tryEmit(openedForms.value + formId)
     }
+
+    fun notifyFormClosed(formId: Int) {
+        _openedForms.tryEmit(openedForms.value - formId)
+    }
 }
