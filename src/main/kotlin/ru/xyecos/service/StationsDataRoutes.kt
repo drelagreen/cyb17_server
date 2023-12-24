@@ -15,6 +15,38 @@ import ru.xyecos.repos.*
  */
 
 fun Routing.stationsDataRoutes(gson: Gson) {
+    get("/fullStations") {
+        call.respondText(
+            gson.toJson(
+                StationsRepo.getInstance().getAll()
+            )
+        )
+    }
+
+    get("/fullParks") {
+        call.respondText(
+            gson.toJson(
+                ParksRepo.getInstance().getAll()
+            )
+        )
+    }
+
+    get("/fullWays") {
+        call.respondText(
+            gson.toJson(
+                WaysRepo.getInstance().getAll()
+            )
+        )
+    }
+
+    get("/fullWagons") {
+        call.respondText(
+            gson.toJson(
+                WagonsRepo.getInstance().getAll()
+            )
+        )
+    }
+
     get("/") {
         call.respondText("API For Railway Stations System")
     }
